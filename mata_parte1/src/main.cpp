@@ -12,8 +12,8 @@ WiFiClient client;
 
 
 String serverIP = "54.83.141.2";
-String wifi = "dlink";
-String password = "";
+String wifi = "FAMILIA_LOPEZ";
+String password = "cheira1996";
 String id = "sensor01";
 String serverPort = "1026";
 const uint16 iterations = 3;
@@ -73,7 +73,7 @@ void sendTask()
       break;
     }
     case VarStatesMachine::TIME_VAR: {
-      const uint32_t intervalVar = 10000;
+      const uint32_t intervalVar = 300000;
       static uint32_t previousMillisVar = 0;
 
       uint32_t currentMillisVar = millis();
@@ -108,12 +108,16 @@ void sendTask()
 	      digitalWrite(sensorPower, LOW);	
       }
 
+      float promHumPlanta = static_cast<float>(dataHumPlanta) / iterations;
+      // Mapear el valor promedio a porcentaje
+      float humedadPorcentaje = map(promHumPlanta, 1024, 535, 0, 100);
+
+
       promTemp = dataTemp / iterations;
       promHum = dataHum / iterations;
-      promHumPlanta = dataHumPlanta / iterations;
 
 
-      dataVar = "{\"temperatura\": {\"value\": " + String(promTemp) + ",\"type\": \"float\"}, \"humedad\": {\"value\": " + String(promHum) +  ",\"type\": \"float\"}, \"humedad_planta\": {\"value\": " + String(promHumPlanta) + ", \"type\": \"float\"}}";
+      dataVar = "{\"temperatura\": {\"value\": " + String(promTemp) + ",\"type\": \"float\"}, \"humedad\": {\"value\": " + String(promHum) +  ",\"type\": \"float\"}, \"humedad_planta\": {\"value\": " + String(humedadPorcentaje) + ", \"type\": \"float\"}}";
       sendDataToServer(dataVar);
       Serial.println(dataVar);
       dataTemp = 0;
